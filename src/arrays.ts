@@ -52,14 +52,28 @@ export function stringsToIntegers(numbers: string[]): number[] {
 // Remember, you can write functions as lambdas too! They work exactly the same.
 export const removeDollars = (amounts: string[]): number[] => {
     // return amounts.map((amount: string): number =>
-    //     !Number(amount)
+    //     amount[0] === "$"
     //         ? 0
     //         : amount[0] !== "$"
     //         ? Number(amount)
     //         : Number(amount.substring(1))
     // );
 
-    const result = amounts.map((amount: string):
+    const result = amounts.map((amount: string): number => {
+        if (amount[0] === "$") {
+            if (Number(amount.substring(1))) {
+                return Number(amount.substring(1));
+            } else {
+                return 0;
+            }
+        } else if (Number(amount)) {
+            return Number(amount);
+        } else {
+            return 0;
+        }
+    });
+
+    return result;
 };
 
 /**
@@ -93,12 +107,23 @@ export function countShortWords(words: string[]): number {
  * then return true.
  */
 export function allRGB(colors: string[]): boolean {
-    return colors.length > 0
-        ? colors.every(
-              (color: string): boolean =>
-                  color === "red" || color === "blue" || color == "green"
-          )
-        : true;
+    // return colors.length > 0
+    //     ? colors.every(
+    //           (color: string): boolean =>
+    //               color === "red" || color === "blue" || color == "green"
+    //       )
+    //     : true;
+
+    //whyyyy eslint whyyyy
+
+    if (colors.length > 0) {
+        return colors.every(
+            (color: string): boolean =>
+                color === "red" || color == "blue" || color == "green"
+        );
+    } else {
+        return true;
+    }
 }
 
 /**
@@ -110,7 +135,8 @@ export function allRGB(colors: string[]): boolean {
  */
 export function makeMath(addends: number[]): string {
     const sum = addends.reduce((curr: number, num: number) => curr + num, 0);
-    return sum.toString() + "=" + addends.join("+");
+    const arrToString = addends.length > 0 ? addends.join("+") : 0;
+    return sum.toString() + "=" + arrToString;
 }
 
 /**
@@ -123,15 +149,19 @@ export function makeMath(addends: number[]): string {
  * And the array [1, 9, 7] would become [1, 9, 7, 17]
  */
 export function injectPositive(values: number[]): number[] {
-    const ind = values.findIndex((value: number): boolean => value > 0);
-    const sum =
-        ind !== -1
-            ? values
-                  .splice(ind, values.length - ind)
-                  .reduce((curr: number, val: number) => curr + val, 0)
-            : values.reduce((curr: number, val: number) => curr + val, 0);
     const result = [...values];
-    return ind !== -1
-        ? result.splice(ind, 0, sum)
-        : result.splice(result.length, 0, sum);
+    const ind = result.findIndex((value: number): boolean => value < 0);
+    let sum: number;
+
+    if (ind !== -1) {
+        const tmp = [...values];
+        tmp.splice(ind, result.length - ind);
+        sum = tmp.reduce((curr: number, val: number) => curr + val, 0);
+        result.splice(ind + 1, 0, sum);
+    } else {
+        sum = result.reduce((curr: number, val: number) => curr + val, 0);
+        result.splice(result.length, 0, sum);
+    }
+
+    return result;
 }
